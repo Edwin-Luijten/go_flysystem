@@ -1,7 +1,6 @@
 package adapter
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,6 +8,7 @@ import (
 	"sync"
 )
 
+// Local ...
 type Local struct {
 	BaseAdapter
 	root    string
@@ -16,9 +16,16 @@ type Local struct {
 	permMap map[string]map[string]os.FileMode
 }
 
+// FilePrivate represents 0600 file permissions
 const FilePrivate = 0600
+
+// FilePublic represents 0644 file permissions
 const FilePublic = 0644
+
+// DirPrivate represents 0700 directory permissions
 const DirPrivate = 0700
+
+// DirPublic represents 0755 directory permissions
 const DirPublic = 0755
 
 // NewLocal creates a new instance of Local
@@ -193,7 +200,7 @@ func (a *Local) ensureDirectory(dir string) error {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err := os.Mkdir(dir, DirPublic)
 		if err != nil {
-			return errors.New(fmt.Sprintf("impossible to create the root directory %s", dir))
+			return fmt.Errorf("impossible to create the root directory %s", dir)
 		}
 	}
 

@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// Adapter ...
 type Adapter interface {
 	Write(path string, contents []byte) error
 	Update(path string, contents []byte) error
@@ -18,10 +19,12 @@ type Adapter interface {
 	SetVisibility(path string, visibility string) error
 }
 
+// BaseAdapter ...
 type BaseAdapter struct {
 	pathPrefix *string
 }
 
+// SetPathPrefix sets the path prefix
 func (a *BaseAdapter) SetPathPrefix(prefix string) {
 	if prefix == "" {
 		a.pathPrefix = nil
@@ -31,6 +34,7 @@ func (a *BaseAdapter) SetPathPrefix(prefix string) {
 	a.pathPrefix = &p
 }
 
+// ApplyPathPrefix applies the path prefix
 func (a *BaseAdapter) ApplyPathPrefix(path string) string {
 	return fmt.Sprintf("%s%s", *a.pathPrefix, strings.TrimPrefix(path, string(os.PathSeparator)))
 }
