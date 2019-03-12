@@ -14,6 +14,16 @@ func TestBaseAdapter_SetPathPrefix(t *testing.T) {
 	}
 }
 
+func TestBaseAdapter_SetPathPrefixEmpty(t *testing.T) {
+	a := &BaseAdapter{}
+	a.SetPathPrefix("")
+
+	if *a.pathPrefix != "/" {
+		t.Log("unexpected path prefix")
+		t.Fail()
+	}
+}
+
 func TestBaseAdapter_ApplyPathPrefix(t *testing.T) {
 	a := &BaseAdapter{}
 	a.SetPathPrefix("data")
