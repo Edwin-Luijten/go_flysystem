@@ -13,10 +13,11 @@ Inspired by: https://github.com/thephpleague/flysystem
 
 ## Usage
 
+### Adapters
+
 ```go
 import (
-	"github.com/edwin-luijten/go_flysystem/adapter"
-    flysystem "github.com/edwin-luijten/go_flysystem"
+    "github.com/edwin-luijten/go_flysystem/adapter"
 )
 
 func main() {
@@ -25,7 +26,34 @@ func main() {
     	panic(err)
     }
     
-    fs := flysystem.New(a)
+    // Write
+    err = a.Write("test.txt", []byte("hello"))
+    if err != nil {
+        t.Log(err)
+        t.Fail()
+    }
+}
+```
+
+### Multiple adapters
+
+```go
+import (
+    "github.com/edwin-luijten/go_flysystem/adapter"
+)
+
+func main() {
+    a, err := adapter.NewLocal("./_testdata")
+    if err != nil {
+    	panic(err)
+    }
+    
+    b, err = adapter.NewLocal("./_testdata")
+    if err != nil {
+        panic(err)
+    }
+    
+    fs, err = flysystem.New(a, b)
     
     // Write
     err = fs.Write("test.txt", []byte("hello"))
