@@ -7,8 +7,19 @@ import (
 	"testing"
 )
 
+var dataPath = "../_testdata/local"
+
+func teardown(t *testing.T) {
+	err := os.RemoveAll(dataPath)
+	if err != nil {
+		t.Log("Nothing to clean up")
+	}
+}
+
 func TestLocal_Write(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -21,7 +32,7 @@ func TestLocal_Write(t *testing.T) {
 		t.Fail()
 	}
 
-	bytes, err := ioutil.ReadFile("../_testdata/test.txt")
+	bytes, err := ioutil.ReadFile("../_testdata/local/test.txt")
 	if err != nil {
 		t.Log(err)
 		t.Fail()
@@ -31,15 +42,12 @@ func TestLocal_Write(t *testing.T) {
 		t.Log("files does not contain: hello world")
 		t.Fail()
 	}
-
-	err = os.Remove("../_testdata/test.txt")
-	if err != nil {
-		panic(err)
-	}
 }
 
 func TestLocal_Update(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -52,7 +60,7 @@ func TestLocal_Update(t *testing.T) {
 		t.Fail()
 	}
 
-	bytes, err := ioutil.ReadFile("../_testdata/test.txt")
+	bytes, err := ioutil.ReadFile("../_testdata/local/test.txt")
 	if err != nil {
 		t.Log(err)
 		t.Fail()
@@ -62,15 +70,12 @@ func TestLocal_Update(t *testing.T) {
 		t.Log("files does not contain: hello")
 		t.Fail()
 	}
-
-	err = os.Remove("../_testdata/test.txt")
-	if err != nil {
-		panic(err)
-	}
 }
 
 func TestLocal_Read(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -93,15 +98,12 @@ func TestLocal_Read(t *testing.T) {
 		t.Log("files does not contain: hello")
 		t.Fail()
 	}
-
-	err = os.Remove("../_testdata/test.txt")
-	if err != nil {
-		panic(err)
-	}
 }
 
 func TestLocal_Rename(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -120,19 +122,16 @@ func TestLocal_Rename(t *testing.T) {
 		t.Fail()
 	}
 
-	if _, err := os.Stat("../_testdata/test_updated.txt"); os.IsNotExist(err) {
+	if _, err := os.Stat("../_testdata/local/test_updated.txt"); os.IsNotExist(err) {
 		t.Log(err)
 		t.Fail()
-	}
-
-	err = os.Remove("../_testdata/test_updated.txt")
-	if err != nil {
-		panic(err)
 	}
 }
 
 func TestLocal_Copy(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -147,7 +146,7 @@ func TestLocal_Copy(t *testing.T) {
 
 	err = fs.Copy("test.txt", "test2.txt")
 
-	if _, err := os.Stat("../_testdata/test2.txt"); os.IsNotExist(err) {
+	if _, err := os.Stat("../_testdata/local/test2.txt"); os.IsNotExist(err) {
 		t.Log(err)
 		t.Fail()
 	}
@@ -157,7 +156,6 @@ func TestLocal_Copy(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-
 
 	contents2, err := fs.Read("test2.txt")
 	if err != nil {
@@ -169,20 +167,12 @@ func TestLocal_Copy(t *testing.T) {
 		t.Log("file contents are not equal")
 		t.Fail()
 	}
-
-	err = os.Remove("../_testdata/test.txt")
-	if err != nil {
-		panic(err)
-	}
-
-	err = os.Remove("../_testdata/test2.txt")
-	if err != nil {
-		panic(err)
-	}
 }
 
 func TestLocal_Delete(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -201,14 +191,16 @@ func TestLocal_Delete(t *testing.T) {
 		t.Fail()
 	}
 
-	if _, err := os.Stat("../_testdata/test.txt"); err == nil {
+	if _, err := os.Stat("../_testdata/local/test.txt"); err == nil {
 		t.Log(err)
 		t.Fail()
 	}
 }
 
 func TestLocal_CreateDir(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -221,19 +213,16 @@ func TestLocal_CreateDir(t *testing.T) {
 		t.Fail()
 	}
 
-	if _, err := os.Stat("../_testdata/subdir"); os.IsNotExist(err) {
+	if _, err := os.Stat("../_testdata/local/subdir"); os.IsNotExist(err) {
 		t.Log("directory does not exist")
 		t.Fail()
-	}
-
-	err = os.Remove("../_testdata/subdir")
-	if err != nil {
-		panic(err)
 	}
 }
 
 func TestLocal_DeleteDir(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -254,7 +243,9 @@ func TestLocal_DeleteDir(t *testing.T) {
 }
 
 func TestLocal_SetVisibility(t *testing.T) {
-	fs, err := NewLocal("../_testdata")
+	defer teardown(t)
+
+	fs, err := NewLocal(dataPath)
 
 	if err != nil {
 		t.Log(err)
@@ -273,17 +264,12 @@ func TestLocal_SetVisibility(t *testing.T) {
 		t.Fail()
 	}
 
-	info, err := os.Stat("../_testdata/test.txt")
+	info, err := os.Stat("../_testdata/local/test.txt")
 	if err != nil {
 		panic(err)
 	}
 
 	if info.Mode() != FilePrivate {
 		t.Log(fmt.Println("wrong permissions: expected %i, got %i", FilePrivate, info.Mode()))
-	}
-
-	err = os.Remove("../_testdata/test.txt")
-	if err != nil {
-		panic(err)
 	}
 }
