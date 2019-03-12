@@ -18,7 +18,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - go test -coverprofile c.out -race
+  - go test ./... -coverprofile c.out -race
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
