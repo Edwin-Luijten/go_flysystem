@@ -100,16 +100,44 @@ func (f *Flysystem) Read(path string) ([]byte, error) {
 	select {
 	case err := <-errors:
 		close(errors)
+		close(contents)
+
 		return nil, err
 	case content := <-contents:
+		close(errors)
 		close(contents)
+
 		return content, nil
 	}
 }
 
 // Rename a file
 func (f *Flysystem) Rename(path string, newPath string) error {
-	panic("to implement")
+	var wg sync.WaitGroup
+	wg.Add(len(f.adapters))
+
+	errors := make(chan error, 1)
+
+	for _, a := range f.adapters {
+		go func(a adapter.Adapter) {
+			defer wg.Done()
+
+			err := a.Rename(path, newPath)
+			if err != nil {
+				errors <- err
+			}
+		}(a)
+	}
+
+	wg.Wait()
+
+	select {
+	case err := <-errors:
+		close(errors)
+		return err
+	default:
+		return nil
+	}
 }
 
 // Copy a file
