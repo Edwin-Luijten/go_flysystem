@@ -2,7 +2,7 @@ package flysystem
 
 import (
 	"github.com/edwin-luijten/go_flysystem/adapter"
-	"sync"
+	"golang.org/x/sync/errgroup"
 )
 
 // Flysystem ...
@@ -19,148 +19,185 @@ func New(adapters ...adapter.Adapter) adapter.Adapter {
 
 // Write a new file
 func (f *Flysystem) Write(path string, contents []byte) error {
-	var wg sync.WaitGroup
-	wg.Add(len(f.adapters))
-
-	errors := make(chan error, 1)
+	var g errgroup.Group
 
 	for _, a := range f.adapters {
-		go func(a adapter.Adapter) {
-			defer wg.Done()
-
+		a := a
+		g.Go(func() error {
 			err := a.Write(path, contents)
-			if err != nil {
-				errors <- err
-			}
-		}(a)
+
+			return err
+		})
 	}
 
-	wg.Wait()
-	close(errors)
-
-	select {
-	case err := <-errors:
+	if err := g.Wait(); err != nil {
 		return err
-	default:
-		return nil
 	}
+
+	return nil
 }
 
 // Update a file
 func (f *Flysystem) Update(path string, contents []byte) error {
-	var wg sync.WaitGroup
-	wg.Add(len(f.adapters))
-
-	errors := make(chan error, 1)
+	var g errgroup.Group
 
 	for _, a := range f.adapters {
-		go func(a adapter.Adapter) {
-			defer wg.Done()
-
+		a := a
+		g.Go(func() error {
 			err := a.Update(path, contents)
-			if err != nil {
-				errors <- err
-			}
-		}(a)
+
+			return err
+		})
 	}
 
-	wg.Wait()
-	close(errors)
-
-	select {
-	case err := <-errors:
+	if err := g.Wait(); err != nil {
 		return err
-	default:
-		return nil
 	}
+
+	return nil
 }
 
 // Read a file
 func (f *Flysystem) Read(path string) ([]byte, error) {
-	var wg sync.WaitGroup
-	wg.Add(len(f.adapters))
+	var g errgroup.Group
+	contents := make([][]byte, len(f.adapters))
 
-	errors := make(chan error, 1)
-	contents := make(chan []byte)
-
-	for _, a := range f.adapters {
-		go func(a adapter.Adapter) {
+	for i, a := range f.adapters {
+		i, a := i, a
+		g.Go(func() error {
 			bytes, err := a.Read(path)
-			if err != nil {
-				errors <- err
+
+			if err == nil {
+				contents[i] = bytes
 			}
 
-			wg.Done()
-			contents <- bytes
-		}(a)
+			return err
+		})
 	}
 
-	wg.Wait()
-
-	select {
-	case err := <-errors:
-		close(errors)
-		close(contents)
-
+	if err := g.Wait(); err != nil {
 		return nil, err
-	case content := <-contents:
-		close(errors)
-		close(contents)
-
-		return content, nil
 	}
+
+	return contents[0], nil
 }
 
 // Rename a file
 func (f *Flysystem) Rename(path string, newPath string) error {
-	var wg sync.WaitGroup
-	wg.Add(len(f.adapters))
-
-	errors := make(chan error, 1)
+	var g errgroup.Group
 
 	for _, a := range f.adapters {
-		go func(a adapter.Adapter) {
-			defer wg.Done()
-
+		a := a
+		g.Go(func() error {
 			err := a.Rename(path, newPath)
-			if err != nil {
-				errors <- err
-			}
-		}(a)
+
+			return err
+		})
 	}
 
-	wg.Wait()
-
-	select {
-	case err := <-errors:
-		close(errors)
+	if err := g.Wait(); err != nil {
 		return err
-	default:
-		return nil
 	}
+
+	return nil
 }
 
 // Copy a file
 func (f *Flysystem) Copy(path string, newPath string) error {
-	panic("to implement")
+	var g errgroup.Group
+
+	for _, a := range f.adapters {
+		a := a
+		g.Go(func() error {
+			err := a.Copy(path, newPath)
+
+			return err
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Delete a file
 func (f *Flysystem) Delete(path string) error {
-	panic("to implement")
+	var g errgroup.Group
+
+	for _, a := range f.adapters {
+		a := a
+		g.Go(func() error {
+			err := a.Delete(path)
+
+			return err
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreateDir creates a directory
 func (f *Flysystem) CreateDir(dir string) error {
-	panic("to implement")
+	var g errgroup.Group
+
+	for _, a := range f.adapters {
+		a := a
+		g.Go(func() error {
+			err := a.CreateDir(dir)
+
+			return err
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // DeleteDir deletes a directory
 func (f *Flysystem) DeleteDir(dir string) error {
-	panic("to implement")
+	var g errgroup.Group
+
+	for _, a := range f.adapters {
+		a := a
+		g.Go(func() error {
+			err := a.DeleteDir(dir)
+
+			return err
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // SetVisibility sets a file or directory to public or private
 func (f *Flysystem) SetVisibility(path string, visibility string) error {
-	panic("to implement")
+	var g errgroup.Group
+
+	for _, a := range f.adapters {
+		a := a
+		g.Go(func() error {
+			err := a.SetVisibility(path, visibility)
+
+			return err
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	return nil
 }
