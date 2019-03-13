@@ -9,6 +9,16 @@ import (
 
 var dataPath = "../_testdata/local"
 
+func setup(t *testing.T) {
+	if _, err := os.Stat("../_testdata/"); os.IsNotExist(err) {
+		err := os.Mkdir("../_testdata/", os.ModePerm)
+		if err != nil {
+			t.Log(err)
+			t.Fail()
+		}
+	}
+}
+
 func teardown(t *testing.T) {
 	err := os.RemoveAll(dataPath)
 	if err != nil {
@@ -17,6 +27,7 @@ func teardown(t *testing.T) {
 }
 
 func TestLocal_Write(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)
@@ -45,6 +56,7 @@ func TestLocal_Write(t *testing.T) {
 }
 
 func TestLocal_Update(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)
@@ -73,6 +85,7 @@ func TestLocal_Update(t *testing.T) {
 }
 
 func TestLocal_Read(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)
@@ -101,6 +114,7 @@ func TestLocal_Read(t *testing.T) {
 }
 
 func TestLocal_Rename(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)
@@ -129,6 +143,7 @@ func TestLocal_Rename(t *testing.T) {
 }
 
 func TestLocal_Copy(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)
@@ -170,6 +185,7 @@ func TestLocal_Copy(t *testing.T) {
 }
 
 func TestLocal_Delete(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)
@@ -198,6 +214,7 @@ func TestLocal_Delete(t *testing.T) {
 }
 
 func TestLocal_CreateDir(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)
@@ -220,6 +237,7 @@ func TestLocal_CreateDir(t *testing.T) {
 }
 
 func TestLocal_DeleteDir(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)
@@ -243,6 +261,7 @@ func TestLocal_DeleteDir(t *testing.T) {
 }
 
 func TestLocal_SetVisibility(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	fs, err := NewLocal(dataPath)

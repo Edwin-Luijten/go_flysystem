@@ -8,6 +8,16 @@ import (
 	"testing"
 )
 
+func setup(t *testing.T) {
+	if _, err := os.Stat("./_testdata/"); os.IsNotExist(err) {
+		err := os.Mkdir("./_testdata/", os.ModePerm)
+		if err != nil {
+			t.Log(err)
+			t.Fail()
+		}
+	}
+}
+
 func teardown(t *testing.T) {
 	err := os.RemoveAll("./_testdata/sub1")
 	if err != nil {
@@ -21,7 +31,8 @@ func teardown(t *testing.T) {
 }
 
 func TestFlysystem_Write(t *testing.T) {
-	//defer teardown(t)
+	setup(t)
+	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
 	if err != nil {
@@ -64,6 +75,7 @@ func TestFlysystem_Write(t *testing.T) {
 }
 
 func TestFlysystem_Update(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
@@ -116,6 +128,7 @@ func TestFlysystem_Update(t *testing.T) {
 }
 
 func TestFlysystem_Read(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
@@ -169,6 +182,7 @@ func TestFlysystem_Read(t *testing.T) {
 }
 
 func TestFlysystem_Rename(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
@@ -209,6 +223,7 @@ func TestFlysystem_Rename(t *testing.T) {
 }
 
 func TestFlysystem_Copy(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
@@ -256,6 +271,7 @@ func TestFlysystem_Copy(t *testing.T) {
 }
 
 func TestFlysystem_Delete(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
@@ -296,6 +312,7 @@ func TestFlysystem_Delete(t *testing.T) {
 }
 
 func TestFlysystem_CreateDir(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
@@ -330,6 +347,7 @@ func TestFlysystem_CreateDir(t *testing.T) {
 }
 
 func TestFlysystem_DeleteDir(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
@@ -370,6 +388,7 @@ func TestFlysystem_DeleteDir(t *testing.T) {
 }
 
 func TestFlysystem_SetVisibility(t *testing.T) {
+	setup(t)
 	defer teardown(t)
 
 	a, err := adapter.NewLocal("./_testdata/sub1")
