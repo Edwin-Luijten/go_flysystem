@@ -3,10 +3,13 @@ package flysystem
 import (
 	"github.com/edwin-luijten/go_flysystem/adapter"
 	"golang.org/x/sync/errgroup"
+	"sync"
 )
 
 // Flysystem ...
 type Flysystem struct {
+	sync.Mutex
+	wg       *sync.WaitGroup
 	adapters []adapter.Adapter
 }
 
@@ -14,6 +17,7 @@ type Flysystem struct {
 func New(adapters ...adapter.Adapter) adapter.Adapter {
 	return &Flysystem{
 		adapters: adapters,
+		wg:       &sync.WaitGroup{},
 	}
 }
 

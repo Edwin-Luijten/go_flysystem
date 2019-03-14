@@ -10,8 +10,8 @@ import (
 var dataPath = "../_testdata/local"
 
 func setup(t *testing.T) {
-	if _, err := os.Stat("../_testdata/"); os.IsNotExist(err) {
-		err := os.Mkdir("../_testdata/", os.ModePerm)
+	if _, err := os.Stat("../_testdata/local"); os.IsNotExist(err) {
+		err := os.Mkdir("../_testdata/local", os.ModePerm)
 		if err != nil {
 			t.Log(err)
 			t.Fail()
@@ -51,6 +51,34 @@ func TestLocal_Write(t *testing.T) {
 
 	if string(bytes) != "hello world" {
 		t.Log("files does not contain: hello world")
+		t.Fail()
+	}
+
+	fs, err = NewLocal("../_testdata/should/fail")
+
+	if err == nil {
+		t.Log("expected an error")
+		t.Fail()
+	}
+
+	fs, err = NewLocal(dataPath)
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	err = fs.Write("local/should/fail/test.txt", []byte("hello world"))
+	if err == nil {
+		t.Log("expected an error: ensure directory")
+		t.Fail()
+	}
+
+	os.Mkdir("../_testdata/local/fail", 444)
+
+	err = fs.Write("local/fail/test.txt", []byte("hello world"))
+	if err == nil {
+		t.Log("expected an error: write file")
 		t.Fail()
 	}
 }
@@ -140,6 +168,12 @@ func TestLocal_Rename(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
+
+	err = fs.Rename("non-existing.txt", "test_updated.txt")
+	if err == nil {
+		t.Log("expected an error: non existing file")
+		t.Fail()
+	}
 }
 
 func TestLocal_Copy(t *testing.T) {
@@ -180,6 +214,26 @@ func TestLocal_Copy(t *testing.T) {
 
 	if string(contents) != string(contents2) {
 		t.Log("file contents are not equal")
+		t.Fail()
+	}
+
+	err = fs.Copy("non-existing.txt", "test2.txt")
+	if err == nil {
+		t.Log("expected an error: non existing file")
+		t.Fail()
+	}
+
+	os.Mkdir("../_testdata/local/fail", os.ModePerm)
+	err = fs.Write("fail/test2.txt", []byte("hello world"))
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	os.Chmod("../_testdata/local/fail", 444)
+	err = fs.Copy("fail/test2.txt", "fail/test3.txt")
+	if err == nil {
+		t.Log("expected an error: no permissions")
 		t.Fail()
 	}
 }
@@ -290,5 +344,32 @@ func TestLocal_SetVisibility(t *testing.T) {
 
 	if info.Mode() != FilePrivate {
 		t.Log(fmt.Println("wrong permissions: expected %i, got %i", FilePrivate, info.Mode()))
+	}
+
+	err = fs.CreateDir("visibility")
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	err = fs.SetVisibility("visibility", "private")
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	info, err = os.Stat("../_testdata/local/visibility")
+	if err != nil {
+		panic(err)
+	}
+
+	if info.Mode() != DirPrivate {
+		t.Log(fmt.Println("wrong permissions: expected %i, got %i", DirPrivate, info.Mode()))
+	}
+
+	err = fs.SetVisibility("not-existing", "private")
+	if err == nil {
+		t.Log("expected an error: non existing folder")
+		t.Fail()
 	}
 }
