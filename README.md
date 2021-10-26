@@ -1,5 +1,7 @@
 # Go Flysystem
 
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/edwin-luijten/go_flysystem?style=flat-square)
+[![Go Reference](https://pkg.go.dev/badge/github.com/Edwin-Luijten/go_flysystem.svg)](https://pkg.go.dev/github.com/Edwin-Luijten/go_flysystem)
 [![Build Status](https://travis-ci.com/Edwin-Luijten/go_flysystem.svg?branch=master)](https://travis-ci.com/Edwin-Luijten/go_flysystem) 
 [![Maintainability](https://api.codeclimate.com/v1/badges/6e48f895875537f89b42/maintainability)](https://codeclimate.com/github/Edwin-Luijten/go_flysystem/maintainability) 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/6e48f895875537f89b42/test_coverage)](https://codeclimate.com/github/Edwin-Luijten/go_flysystem/test_coverage)  

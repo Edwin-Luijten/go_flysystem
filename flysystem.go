@@ -14,7 +14,7 @@ type Flysystem struct {
 }
 
 // New creates a new instance with given adapters
-func New(adapters ...adapter.Adapter) adapter.Adapter {
+func New(adapters ...adapter.Adapter) *Flysystem {
 	return &Flysystem{
 		adapters: adapters,
 		wg:       &sync.WaitGroup{},

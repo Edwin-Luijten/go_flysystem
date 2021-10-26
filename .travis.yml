@@ -1,11 +1,9 @@
+os: linux
+dist: bionic
 language: go
 
-env:
-  - GO111MODULE=on
-
 go:
-  - 1.11.x
-  - 1.12.x
+  - 1.16.x
   - master
 
 git:
@@ -15,10 +13,9 @@ before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
-  - mkdir _testdata
 
 script:
-  - go test ./... -coverprofile c.out -race
+  - go test -coverprofile c.out -race
 
 after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT -p $(go list -m)
